@@ -1,9 +1,9 @@
-const CACHE_NAME = "candelaria-en-v14";
+﻿const CACHE_NAME = "costa-adeje-en-v1";
 
 const ASSETS = [
   "./",
   "./index.html",
-  "./Candelaria.geojson",
+  "./costa-adeje.geojson",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
@@ -12,19 +12,24 @@ const ASSETS = [
 ];
 
 const AUDIO_URLS = [
-  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/candelaria_en/0.%20Candelaria-Intro.mp3",
-  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/candelaria_en/1.%20Candelaria.mp3",
-  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/candelaria_en/2.1.Candelaria.mp3",
-  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/candelaria_en/2.2.Candelaria.mp3",
-  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/candelaria_en/2.3.Candelaria.mp3",
-  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/candelaria_en/2.4.Candelaria.mp3",
-  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/candelaria_en/2.5.Candelaria.mp3",
-  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/candelaria_en/2.6.Candelaria.mp3",
-  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/candelaria_en/3.%20Candelaria.mp3",
-  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/candelaria_en/4.1.Candelaria.mp3",
-  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/candelaria_en/4.2.Candelaria.mp3",
-  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/candelaria_en/4.3.Candelaria.mp3"
+  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/costa-adeje_en/0.mp3",
+  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/costa-adeje_en/1.mp3",
+  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/costa-adeje_en/2.mp3",
+  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/costa-adeje_en/3.mp3",
+  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/costa-adeje_en/4.mp3",
+  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/costa-adeje_en/5.mp3",
+  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/costa-adeje_en/6.mp3",
+  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/costa-adeje_en/7.mp3",
+  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/costa-adeje_en/8.mp3",
+  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/costa-adeje_en/9.mp3",
+  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/costa-adeje_en/10.mp3",
+  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/costa-adeje_en/11.mp3",
+  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/costa-adeje_en/12.mp3",
+  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/costa-adeje_en/13.mp3",
+  "https://xzymbvnljudyypdyuisf.supabase.co/storage/v1/object/public/costa-adeje_en/14.mp3"
 ];
+
+
 
 const TILES = [
   "./tiles/11/927/854.png",
@@ -824,7 +829,6 @@ const TILES = [
   "./tiles/17/59455/54893.png"
 ];
 
-// Helper to dynamically cache files with tolerance to single failures
 async function cacheListTolerantly(cache, list) {
   for (const url of list) {
     try {
@@ -835,21 +839,19 @@ async function cacheListTolerantly(cache, list) {
   }
 }
 
-// Install SW and cache assets
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async cache => {
-      // 1) Critical resources (must succeed)
       await cache.addAll(ASSETS);
-      // 2) Tolerant caching in the background
       cacheListTolerantly(cache, AUDIO_URLS);
-      cacheListTolerantly(cache, TILES);
+      if (TILES.length > 0) {
+        cacheListTolerantly(cache, TILES);
+      }
     })
   );
   self.skipWaiting();
 });
 
-// Activate SW and clean old caches
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -863,12 +865,10 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
-// Helper for HTTP 206 Range Requests for audio streaming/seeking on iOS
 async function handleRangeRequest(request, rangeHeader) {
   const cachedResponse = await caches.match(request.url);
   
   if (!cachedResponse) {
-    // If not cached, do direct pass-through and download full response in background
     const cleanRequest = new Request(request.url);
     fetch(cleanRequest).then(networkResponse => {
       if (networkResponse.status === 200) {
@@ -895,7 +895,7 @@ async function handleRangeRequest(request, rangeHeader) {
     status: 206,
     statusText: 'Partial Content',
     headers: {
-      'Content-Range': `bytes ${start}-${end}/${totalSize}`,
+      'Content-Range': ytes -/,
       'Content-Length': chunk.byteLength.toString(),
       'Content-Type': cachedResponse.headers.get('Content-Type') || 'audio/mpeg',
       'Accept-Ranges': 'bytes'
@@ -903,7 +903,6 @@ async function handleRangeRequest(request, rangeHeader) {
   });
 }
 
-// Fetch interception
 self.addEventListener("fetch", event => {
   const url = new URL(event.request.url);
   
@@ -913,7 +912,6 @@ self.addEventListener("fetch", event => {
 
   const rangeHeader = event.request.headers.get('range');
 
-  // 1) Audio files (Supabase storage or .mp3 files)
   if (url.href.includes("supabase.co/storage") || url.pathname.endsWith(".mp3")) {
     if (rangeHeader) {
       event.respondWith(handleRangeRequest(event.request, rangeHeader));
@@ -933,7 +931,6 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  // 2) JSON / GeoJSON (Network-first style)
   if (url.pathname.endsWith(".json") || url.pathname.endsWith(".geojson")) {
     event.respondWith(
       fetch(event.request)
@@ -949,7 +946,6 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  // 3) Static assets (Cache-first)
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
