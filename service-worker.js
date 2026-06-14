@@ -30,7 +30,6 @@ const AUDIO_URLS = [
 ];
 
 
-
 const TILES = [
   "./tiles/11/927/854.png",
   "./tiles/11/927/855.png",
@@ -156,6 +155,9 @@ const TILES = [
   "./tiles/13/3714/3430.png",
   "./tiles/13/3715/3429.png",
   "./tiles/13/3715/3430.png",
+  "./tiles/13/3716/3428.png",
+  "./tiles/13/3716/3429.png",
+  "./tiles/13/3716/3430.png",
   "./tiles/14/7429/6858.png",
   "./tiles/14/7429/6859.png",
   "./tiles/14/7429/6860.png",
